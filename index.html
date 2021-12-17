@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!--Name:John Davis
+        Date:12/15/21
+        Program:Current Weather
+        Notes: The mounted section has more explanation as it is what the rest of the scripts are based off of.  
+    -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Current Weather</title>
+    <!--Bootstrap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!--CSS Link-->
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+    <div class="" id="app">
+        <main>
+            <!--search bar with two buttons below that have vue on click events on them that trigger the F or C functions-->
+            <div class="search-box row" id="search-Box">
+                <input type="text" name="zip" placeholder="Enter your ZIP Code... " id="zip" class="search-bar"><span
+                    id="errName"> </span>
+                <div class="buttons col">
+                    <p>Press one!</p>
+                    <button class="button" id="button" v-on:click="getTempF(zip)">° F</button>
+                    <button class="button" id="button" v-on:click="getTempC(zip)">° C </button>
+                </div>
+                <!--Where the temp and weather pic will show-->
+                <div class="weather-box">
+                    {{message}}
+                    <div class="temp">{{weather.main.temp}}</div>
+
+
+                </div>
+
+            </div>
+
+            <div class=" col weather-wrap">
+                <div class="location-box">
+                    <div class=" location"> {{weather.name}}</div>
+                    <div class="weather">{{weather.weather[0].description}}
+                        <!--grabs the icon using the sites default path and then using a variable that finds the icon section of the weather array-->
+                        <img id="pic" class="pic"
+                            v-bind:src="'http://openweathermap.org/img/wn/' + weatherIcon + '@2x.png' " />
+                    </div>
+
+
+
+                </div>
+
+
+                <div class="footer">
+                    <footer>
+
+                        <p>John Davis, CIS-131, 12/17/2101</p>
+                    </footer>
+
+                </div>
+
+        </main>
+    </div>
+
+    <!--axios and vue CDN things-->
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        //grabs the zip code from user input
+
+        var zip = document.getElementById("zip").value;
+        //holds the apiKey in a variable
+        const apiKey = '224c751b01d0ff1613277c93d4edf3f1';
+        //holds the base url of the api that we are calling
+        const apiUrl = 'https://api.openweathermap.org/data/2.5/weather?zip=';
+        //holds the country code
+        apiLocation = ',us&appid=';
+        const app = new Vue({
+            el: '#app',
+            data: {
+                //this holds the results of the api call, making an array of the results allows me to handle multiple results. some of these are unused
+                weather: [],
+                zip: "",
+                iconCode: "",
+                weatherIconArry: [],
+                weatherIcon: "",
+                message: "This is in Kelvin!"
+
+
+
+
+
+
+            },
+            methods: {
+                getTempF(zip) {
+
+                    console.warn('you did it');
+                    var zip = document.getElementById("zip").value;
+                    console.log(zip)
+
+                    //tests zip to make sure it has 5 numbers, optionally it can have the XXXXX-XXXX format as well.
+                    var isValidZip = /^\b\d{5}(-\d{4})?\b$/.test(zip)
+                    if (!isValidZip) {
+                        console.warn('this worked')
+                        //error messages for when the user fails to enter a zip correctly, taken from your video on error messages essentially
+                        document.getElementById('zip').style.backgroundColor = "#ffccff";
+                        var zipError = document.getElementById('errName');
+                        zipError.style.display = "inline";
+                        zipError.innerHTML = "Zip codes are 5 digits long EX:65714";
+
+
+
+                    } else {
+                        //if it passes the regex then the api is called
+                        axios.get(
+                                apiUrl + zip + apiLocation + apiKey
+                            )
+                            .then((response) => {
+
+                                //mmaking a variable of the response data
+
+                                this.weather = response.data;
+                                var iconCode = this.weather.weather[0].icon;
+                                //same as below
+                                this.weatherIconArry = response.data.weather[0];
+                                this.weatherIcon = response.data.weather[0].icon
+                                //Changes the message
+                                this.message = "This is in Fahrenheit!";
+
+                                //k to F formula
+                                this.weather.main.temp =
+                                    Math.round(this.weather.main.temp - 273.15) * 9 / 5 + 32 + " °F"
+
+
+                            })
+                    }
+
+
+
+
+
+
+                },
+                getTempC(zip) {
+                    console.warn('you did it');
+                    zip = document.getElementById("zip").value;
+
+                    //tests zip to make sure it has 5 numbers, optionally it can have the XXXXX-XXXX format as well.
+                    var isValidZip = /^\b\d{5}(-\d{4})?\b$/.test(zip)
+                    if (!isValidZip) {
+                        console.warn('this worked')
+
+                        //error messages for when the user fails to enter a zip correctly, taken from your video on error messages essentially
+                        document.getElementById('zip').style.backgroundColor = "#ffccff";
+                        var zipError = document.getElementById('errName');
+                        zipError.style.display = "inline";
+                        zipError.innerHTML = "Zip codes are 5 digits long EX:65714";
+
+
+
+                        //if it passes the regex then the api is called
+                    } else {
+                        axios.get(
+                                apiUrl + zip + apiLocation + apiKey
+                            )
+                            .then((response) => {
+                                message = "This is in Celcius!"
+                                //mmaking a variable of the response data
+                                this.weather = response.data;
+                                var iconCode = this.weather.weather[0].icon;
+                                //same as below
+                                this.weatherIconArry = response.data.weather[0];
+                                this.weatherIcon = response.data.weather[0].icon
+                                //Changes the message
+                                this.message = "This is in Celcius!";
+                                //K to C math
+                                this.weather.main.temp =
+                                    Math.round(this.weather.main.temp - 273.15) + " °C"
+
+                            })
+                    }
+
+
+
+
+                }
+            }, //this is the starter page with a hard coded zipcode and it keeps the raw temp value that is in kelvin to show that both functions work
+            //The api key that we are grabbing everything from
+            mounted() {
+                axios.get(
+                        apiUrl + '94040' + apiLocation + apiKey
+                    )
+                    .then((response) => {
+
+                        //mmaking a variable of the response data
+                        this.weather = response.data;
+                        var iconCode = this.weather.weather[0].icon;
+                        //this grabbed the array named weather and made it into its own array
+                        this.weatherIconArry = response.data.weather[0];
+                        //this goes through the above array and grabs the specific icon location usually a string like '10d'
+                        this.weatherIcon = response.data.weather[0].icon
+                        //testing
+                        console.log(this.weather)
+                        console.log(this.weather.name)
+                        console.log(this.weather.weather[0].description)
+                        console.log(this.weather.main.temp)
+                        console.log(this.weather);
+                        console.log(this.weather.weather[0].icon);
+                        console.log(iconCode);
+                        console.log(this.weatherIcon);
+                        console.log(this.weather.weather[0].icon)
+
+
+
+                    })
+            }
+        })
+    </script>
+</body>
+
+</html>
